@@ -13,9 +13,9 @@ export default function Login() {
   return (
     <View style={[styles.bg, { backgroundColor: theme.primary }]}> 
       {/* Leaf top-left */}
-      <Image source={require('../assets/images/leaf1.png')} style={styles.leafTopLeft} />
+      <Image source={require('../../assets/images/leaf1.png')} style={styles.leafTopLeft} />
       {/* Leaf bottom-right */}
-      <Image source={require('../assets/images/leaf2.png')} style={styles.leafBottomRight} />
+      <Image source={require('../../assets/images/leaf2.png')} style={styles.leafBottomRight} />
       {/* Title and subtitle at the top */}
       <View style={styles.headerTop}>
         <Text style={styles.title}>Masuk</Text>
