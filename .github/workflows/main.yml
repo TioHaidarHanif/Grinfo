@@ -1,31 +1,36 @@
-name: Build and Deploy Expo Web
+name: Build and Deploy Expo Web to GitHub Pages
 
 on:
   push:
     branches:
-      - master  # jalan tiap push ke branch master
+      - master  # ganti dengan branch utama kamu kalau bukan "main"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Ambil kode dari repo
       - name: Checkout Repo
         uses: actions/checkout@v3
 
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
+      # 3️⃣ Install dependencies
       - name: Install Dependencies
         run: npm install
 
+      # 4️⃣ Build Expo Web (SDK terbaru)
       - name: Build Expo Web
-        run: npx expo export:web
+        run: npx expo export --platform web
 
+      # 5️⃣ Deploy ke GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./web-build
+          publish_dir: ./dist
