@@ -1,6 +1,8 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { login } from '../../api/backend/auth';
+import AuthForm from '../../components/AuthForm';
 import { Colors } from '../../constants/Colors';
 
 const { width, height } = Dimensions.get('window');
@@ -9,6 +11,22 @@ const theme = Colors[colorScheme];
 
 export default function Login() {   
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async (form: { email: string; password: string }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await login(form);
+      // Simpan token jika perlu: localStorage.setItem('token', res.token);
+      alert("Berhasil Login dengan data: " + JSON.stringify(res));
+      router.replace('/'); // atau ke halaman lain setelah sukses
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Login gagal');
+    }
+    setLoading(false);
+  };
 
   return (
     <View style={[styles.bg, { backgroundColor: theme.primary }]}> 
@@ -21,24 +39,7 @@ export default function Login() {
         <Text style={styles.title}>Masuk</Text>
         <Text style={styles.subtitle}>Silahkan masuk ke akun anda</Text>
       </View>
-      <View style={styles.formContainer}>
-        {/* Input Email */}
-        <Text style={styles.label}>Alamat Email</Text>
-        <View style={styles.inputBox}>
-          <MaterialIcons name="email" size={22} color={theme.highlight} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Masukan alamat email" placeholderTextColor="#A5A3B8" />
-        </View>
-        {/* Input Password */}
-        <Text style={styles.label}>Kata Sandi</Text>
-        <View style={styles.inputBox}>
-          <MaterialIcons name="lock" size={22} color={theme.highlight} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Masukan kata sandi" placeholderTextColor="#A5A3B8" secureTextEntry />
-        </View>
-        {/* Tombol Masuk */}
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Masuk</Text>
-        </TouchableOpacity>
-      </View>
+      <AuthForm type="login" onSubmit={handleLogin} loading={loading} error={error} />
       <TouchableOpacity onPress={() => router.push('/auth/register')}>
         <Text style={styles.link}>Belum punya akun? Daftar</Text>
       </TouchableOpacity>

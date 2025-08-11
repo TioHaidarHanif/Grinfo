@@ -1,13 +1,44 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AuthForm from '../../components/AuthForm';
 import { Colors } from '../../constants/Colors';
+import { register } from '../../controllers/AuthController';
 const { width, height } = Dimensions.get('window');
 const colorScheme = 'light'; // Atur sesuai kebutuhan, bisa pakai useColorScheme
 const theme = Colors[colorScheme];
 
 export default function Register() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRegister = (form: { name?: string; username?: string; email: string; password: string }) => {
+    setLoading(true);
+    setError(null);
+    // Ensure name and username are defined before calling register
+    if (!form.name || !form.username) {
+      setError('Nama dan username wajib diisi');
+      setLoading(false);
+      return;
+    }
+    register({
+      name: form.name,
+      username: form.username,
+      email: form.email,
+      password: form.password
+    })
+      .then((res) => {
+        // Simpan token jika perlu: localStorage.setItem('token', res.token);
+        router.replace('/'); // atau ke halaman lain setelah sukses
+      })
+      .catch((err: any) => {
+        setError(err?.response?.data?.message || 'Registrasi gagal');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <View style={[styles.bg, { backgroundColor: theme.primary }]}> 
@@ -20,36 +51,7 @@ export default function Register() {
         <Text style={styles.title}>Daftar</Text>
         <Text style={styles.subtitle}>Silahkan masuk ke akun anda</Text>
       </View>
-      <View style={styles.formContainer}>
-        {/* Nama Lengkap */}
-        <Text style={styles.label}>Nama Lengkap</Text>
-        <View style={styles.inputBox}>
-          <MaterialIcons name="person" size={22} color={theme.highlight} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Masukkan nama lengkap" placeholderTextColor="#A5A3B8" />
-        </View>
-        {/* Nama Pengguna */}
-        <Text style={styles.label}>Nama Pengguna</Text>
-        <View style={styles.inputBox}>
-          <MaterialIcons name="account-circle" size={22} color={theme.highlight} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Masukan nama pengguna" placeholderTextColor="#A5A3B8" />
-        </View>
-        {/* Email */}
-        <Text style={styles.label}>Alamat Email</Text>
-        <View style={styles.inputBox}>
-          <MaterialIcons name="email" size={22} color={theme.highlight} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Masukan alamat email" placeholderTextColor="#A5A3B8" />
-        </View>
-        {/* Kata Sandi */}
-        <Text style={styles.label}>Kata Sandi</Text>
-        <View style={styles.inputBox}>
-          <MaterialIcons name="lock" size={22} color={theme.highlight} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Masukan kata sandi" placeholderTextColor="#A5A3B8" secureTextEntry />
-        </View>
-        {/* Tombol Daftar */}
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Daftar</Text>
-        </TouchableOpacity>
-      </View>
+      <AuthForm type="register" onSubmit={handleRegister} loading={loading} error={error} />
       <TouchableOpacity onPress={() => router.push('/auth/login')}>
         <Text style={styles.link}>Sudah punya akun? Masuk</Text>
       </TouchableOpacity>

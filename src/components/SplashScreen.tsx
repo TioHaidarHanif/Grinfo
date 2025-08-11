@@ -1,4 +1,4 @@
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useColorScheme } from '@/src/hooks/useColorScheme';
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { Colors } from '../constants/Colors';
 
